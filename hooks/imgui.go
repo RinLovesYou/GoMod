@@ -1,7 +1,9 @@
 package hooks
 
 import (
+	"GoMod/keybinds"
 	"GoMod/menu"
+	"GoMod/utils"
 	"unsafe"
 
 	"github.com/RinLovesYou/imgui-go"
@@ -44,7 +46,10 @@ func OnPresent(pSwapChain unsafe.Pointer, SyncInterval, FlagsT uint32) error {
 		imgui.CreateContext(nil)
 
 		menu.SetStyle()
-		menu.Init()
+		utils.Benchmark(func() error {
+			menu.Init()
+			return nil
+		}, "initializing menu")
 
 		imgui.Win32Init(window)
 		imgui.Dx11Init(device, context)
@@ -65,12 +70,14 @@ func OnPresent(pSwapChain unsafe.Pointer, SyncInterval, FlagsT uint32) error {
 	return nil
 }
 
+var param uint64
+
 func WndProc(hwnd unsafe.Pointer, msg uint32, wparam, lparam unsafe.Pointer) error {
 	imgui.Win32WndProcHandler(hwnd, msg, wparam, lparam)
 
 	if wparam != nil {
+		param = *(*uint64)(wparam)
 		if msg == 0x0100 || msg == 0x0104 { //keydown/syskeydown
-			param := *(*uint64)(wparam)
 			if param < 256 {
 				switch param {
 				case 'Y', 'y':
@@ -84,7 +91,10 @@ func WndProc(hwnd unsafe.Pointer, msg uint32, wparam, lparam unsafe.Pointer) err
 					}
 				}
 			}
+
+			keybinds.UpdateFly(param)
 		}
 	}
+
 	return nil
 }

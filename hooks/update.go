@@ -7,6 +7,7 @@ package hooks
 import "C"
 import (
 	"GoMod/dispatcher"
+	"GoMod/keybinds"
 	"GoMod/reflect/AsmCs"
 	"GoMod/utils"
 	"errors"
@@ -34,21 +35,10 @@ func initUpdateHook() error {
 	return gominhook.EnableHook(methodPtr)
 }
 
-// 	methodPtr, err := method.GetPointer()
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	err = gominhook.CreateHook(methodPtr, uintptr(C.onUpdate), uintptr(unsafe.Pointer(&updateOriginal)))
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return gominhook.EnableHook(methodPtr)
-// }
-
 //export onUpdate
 func onUpdate() {
+	keybinds.UpdateFlyOnUpdate()
+
 	select {
 	case fn := <-dispatcher.DispatcherQueue:
 		err := fn()

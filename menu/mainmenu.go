@@ -1,11 +1,13 @@
 package menu
 
 import (
+	"GoMod/keybinds"
 	"GoMod/reflect/unity"
 	"GoMod/utils"
 	"fmt"
 
 	"github.com/RinLovesYou/imgui-go"
+	"github.com/lucasb-eyer/go-colorful"
 )
 
 type MainMenu struct {
@@ -19,6 +21,8 @@ func NewMainMenu() *MainMenu {
 		ShowConsole: StringBool(true),
 	}
 }
+
+var rainbowMenu StringBool
 
 type StringBool bool
 
@@ -42,7 +46,23 @@ func (m *MainMenu) Init() {
 	}))
 }
 
+var rainbow = colorful.Hsv(0, 1, 1)
+var green = getColor(0, 1, 0, 1)
+var colorFloat float64 = 0
+
 func (m *MainMenu) Render() {
+	colorFloat++
+	if colorFloat > 360 {
+		colorFloat = 0
+	}
+	rainbow = colorful.Hsv(colorFloat, 1, 1)
+
+	var colorToUse imgui.Vec4
+	if rainbowMenu {
+		colorToUse = imgui.Vec4{X: float32(rainbow.Clamped().R), Y: float32(rainbow.Clamped().G), Z: float32(rainbow.Clamped().B), W: 1}
+	} else {
+		colorToUse = green
+	}
 	if m.ShowConsole {
 
 		imgui.SetNextWindowSizeV(imgui.Vec2{X: 400, Y: 200}, imgui.ConditionFirstUseEver)
@@ -54,7 +74,7 @@ func (m *MainMenu) Render() {
 		for _, msg := range utils.LogBuffer {
 			imgui.PushStyleVarVec2(imgui.StyleVarItemSpacing, imgui.Vec2{0, 0})
 			imgui.Text("[")
-			imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: 0.09, Y: 0.976, Z: 0.043, W: 1.0})
+			imgui.PushStyleColor(imgui.StyleColorText, colorToUse)
 			imgui.SameLine()
 			imgui.Text(msg.TimeStamp)
 			imgui.PopStyleColor()
@@ -71,9 +91,14 @@ func (m *MainMenu) Render() {
 			imgui.SameLine()
 			imgui.Text(msg.Message)
 			imgui.PopStyleVar()
-			imgui.SetScrollHereY(1)
+			if utils.JustLogged {
+				imgui.SetScrollHereY(1)
+			}
 		}
-		imgui.SetScrollHereY(1)
+		if utils.JustLogged {
+			imgui.SetScrollHereY(1)
+			utils.JustLogged = false
+		}
 		imgui.EndChild()
 		imgui.PopFont()
 
@@ -124,9 +149,15 @@ func (m *MainMenu) Render() {
 	imgui.SetNextWindowSizeV(imgui.Vec2{X: 400, Y: 200}, imgui.ConditionFirstUseEver)
 	imgui.BeginV("Main Menu", &m.Shown, imgui.WindowFlagsNoTitleBar)
 
+	if rainbowMenu {
+		colorToUse = imgui.Vec4{X: float32(rainbow.Clamped().R), Y: float32(rainbow.Clamped().G), Z: float32(rainbow.Clamped().B), W: 1}
+	} else {
+		colorToUse = Cyan
+	}
+
 	// Logo
 	imgui.PushFont(ImpactBeeg)
-	imgui.PushStyleColor(imgui.StyleColorText, Cyan)
+	imgui.PushStyleColor(imgui.StyleColorText, colorToUse)
 	imgui.Text("GoMod")
 	imgui.PopStyleColor()
 	imgui.PopFont()
@@ -151,7 +182,9 @@ func (m *MainMenu) Render() {
 var targetFramerate int32 = 120
 
 func (m *MainMenu) homePageRender() {
+	imgui.BeginChildV("HomePage", imgui.Vec2{X: 0, Y: 0}, false, imgui.WindowFlagsHorizontalScrollbar)
 	if imgui.CollapsingHeader("General") {
+		//being: console button
 		if imgui.Selectable("Console") {
 			m.ShowConsole = !m.ShowConsole
 		}
@@ -160,21 +193,47 @@ func (m *MainMenu) homePageRender() {
 		color := getColor(1, 0, 0, 1)
 		if m.ShowConsole {
 			color = getColor(0, 1, 0, 1)
+			if rainbowMenu {
+				color = imgui.Vec4{X: float32(rainbow.Clamped().R), Y: float32(rainbow.Clamped().G), Z: float32(rainbow.Clamped().B), W: 1}
+			}
 		}
 		imgui.PushStyleColor(imgui.StyleColorText, color)
-		imgui.Text(fmt.Sprintf("%s", m.ShowConsole))
+		imgui.Text(m.ShowConsole.String())
 		imgui.PopStyleColor()
 
+		//end: console button
+
+		//begin: rainbow button
+		if imgui.Selectable("Rainbow") {
+			rainbowMenu = !rainbowMenu
+		}
+
+		imgui.SameLine()
+		color = getColor(1, 0, 0, 1)
+		if rainbowMenu {
+			color = imgui.Vec4{X: float32(rainbow.Clamped().R), Y: float32(rainbow.Clamped().G), Z: float32(rainbow.Clamped().B), W: 1}
+		}
+		imgui.PushStyleColor(imgui.StyleColorText, color)
+		imgui.Text(rainbowMenu.String())
+		imgui.PopStyleColor()
+		//end: rainbow button
+
+		//begin: framerate slider
 		imgui.DragIntV("Target Framerate", &targetFramerate, 1, 10, 240, "%.0f", imgui.SliderFlagsNone)
 
 		imgui.SameLine()
 		if imgui.Button("Set") {
-			unity.SetTargetFramerate(targetFramerate)
+			unity.SetTargetFramerate(int(targetFramerate + 2))
 			utils.Log("Target Framerate set to %d", targetFramerate)
 		}
+		//end: framerate slider
 
+		//begin: fly speed slider
+		imgui.DragFloatV("Fly Speed", &keybinds.FlySpeed, 0.1, 0.1, 10, "%.1f", imgui.SliderFlagsNone)
+		//end: fly speed slider
 	}
 
 	imgui.CollapsingHeader("Placeholder")
 	imgui.CollapsingHeader("Placeholder")
+	imgui.EndChild()
 }

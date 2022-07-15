@@ -19,6 +19,13 @@ func NewPlayerList() PlayerList {
 }
 
 func (p PlayerList) Render() {
+	var colorToUse imgui.Vec4
+	if rainbowMenu {
+		colorToUse = imgui.Vec4{X: float32(rainbow.Clamped().R), Y: float32(rainbow.Clamped().G), Z: float32(rainbow.Clamped().B), W: 1}
+	} else {
+		colorToUse = mainColor
+	}
+
 	if p.Shown {
 		imgui.SetNextWindowPosV(imgui.Vec2{X: 10, Y: 15}, imgui.ConditionAlways, imgui.Vec2{})
 		imgui.SetNextWindowSizeConstraints(imgui.Vec2{X: 200, Y: 0}, imgui.Vec2{X: 400, Y: 800})
@@ -27,7 +34,7 @@ func (p PlayerList) Render() {
 
 		imgui.PushFont(DroidSansBeeg)
 
-		imgui.PushStyleColor(imgui.StyleColorText, mainColor)
+		imgui.PushStyleColor(imgui.StyleColorText, colorToUse)
 		imgui.Text("PlayerList")
 		imgui.PopStyleColor()
 		imgui.SameLine()

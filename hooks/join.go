@@ -68,7 +68,13 @@ func onJoin(managerPtrC, playerPtrC unsafe.Pointer) {
 		return
 	}
 
-	playerCache[playerPtr] = player.ApiPlayer().DisplayName()
+	name, err := utils.ToAscii(player.ApiPlayer().DisplayName())
+	if err != nil {
+		name = player.ApiPlayer().DisplayName()
+		utils.Error("There was an error converting the player's name")
+	}
+
+	playerCache[playerPtr] = name
 
 	utils.Log("Player joined: %s", playerCache[playerPtr])
 

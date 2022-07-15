@@ -5,7 +5,11 @@ import (
 	"fmt"
 	"os"
 	"time"
+
+	"github.com/mozillazg/go-unidecode"
 )
+
+var JustLogged bool
 
 type LogMessage struct {
 	TimeStamp string
@@ -31,6 +35,7 @@ func Log(message string, format ...any) {
 		Prefix:    "GoMod",
 		Message:   fmt.Sprintf(message, format...),
 	})
+	JustLogged = true
 }
 
 func Error(message string, format ...any) {
@@ -40,6 +45,7 @@ func Error(message string, format ...any) {
 		Prefix:    "GoMod",
 		Message:   fmt.Sprintf(message, format...),
 	})
+	JustLogged = true
 }
 
 func timeStamp(err bool) string {
@@ -125,4 +131,8 @@ func FileExists(filename string) bool {
 	} else {
 		return false
 	}
+}
+
+func ToAscii(str string) (string, error) {
+	return unidecode.Unidecode(str), nil
 }

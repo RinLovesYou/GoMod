@@ -1,8 +1,8 @@
 #include "il2cpp.h"
 
 #include "Object.h"
-#include <string>
 #include <Windows.h>
+#include <string>
 
 uint32_t ippNewGcHandle(IppObject handle, IppBool pinned)
 {
@@ -28,15 +28,26 @@ const char *ippUnboxString(IppObject handle)
    if (length == 0)
       return "";
 
-   uint16_t* chars = il2cpp_string_chars(str);
-   
+   uint16_t *chars = il2cpp_string_chars(str);
+
    return utf8_encode(chars, length);
 }
 
-const char* utf8_encode(uint16_t* wstr, int32_t length)
+void *ippUnboxObject(IppObject handle)
 {
-    int size_needed = WideCharToMultiByte(CP_UTF8, 0, (LPCWCH)&wstr[0], (int)length, NULL, 0, NULL, NULL);
-    std::string strTo( size_needed, 0 );
-    WideCharToMultiByte                  (CP_UTF8, 0, (LPCWCH)&wstr[0], (int)length, &strTo[0], size_needed, NULL, NULL);
-    return strTo.c_str();
+   Il2CppObject *obj = reinterpret_cast<Il2CppObject *>(handle);
+   return il2cpp_object_unbox(obj);
+}
+
+IppString ippNewString(const char *str)
+{
+   return reinterpret_cast<IppString>(il2cpp_string_new(str));
+}
+
+const char *utf8_encode(uint16_t *wstr, int32_t length)
+{
+   int size_needed = WideCharToMultiByte(CP_UTF8, 0, (LPCWCH)&wstr[0], (int)length, NULL, 0, NULL, NULL);
+   std::string strTo(size_needed, 0);
+   WideCharToMultiByte(CP_UTF8, 0, (LPCWCH)&wstr[0], (int)length, &strTo[0], size_needed, NULL, NULL);
+   return strTo.c_str();
 }

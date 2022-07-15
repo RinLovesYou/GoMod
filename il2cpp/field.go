@@ -37,8 +37,8 @@ func (f *Field) GetValueObject(o *Object) *Object {
 		utils.Log("Getting static field %s", f.GetName())
 		return_val = C.ippGetFieldValueObject(f.handle, nil)
 	} else {
-		return_val = C.ippGetFieldValueObject(f.handle, o.handle)
+		return_val = C.ippGetFieldValueObject(f.handle, o.Handle)
 	}
 
-	return &Object{handle: return_val}
+	return &Object{Handle: return_val}
 }

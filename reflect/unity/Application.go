@@ -6,6 +6,7 @@ import (
 )
 
 //#include <stdint.h>
+//#include <stdlib.h>
 import "C"
 
 var (
@@ -13,7 +14,8 @@ var (
 	targetFramerate, _  = ApplicationClass.GetProperty("targetFrameRate")
 )
 
-func SetTargetFramerate(val int32) {
-	arg := C.int32_t(val + 2)
-	targetFramerate.GetSet().Invoke(uintptr(unsafe.Pointer(&arg)))
+func SetTargetFramerate(val int) {
+	targetFramerate.GetSet().Invoke(
+		uintptr(unsafe.Pointer(&val)),
+	)
 }

@@ -21,6 +21,10 @@ var (
 	apiPlayerProp, _ = PlayerClass.GetPropertyWhere(func(p il2cpp.Property) bool {
 		return p.GetGet().GetReturnType().GetName() == "VRC.SDKBase.VRCPlayerApi"
 	})
+
+	localPlayerProp, _ = PlayerClass.GetPropertyWhere(func(p il2cpp.Property) bool {
+		return p.GetGet().GetReturnType().GetName() == PlayerClass.GetName()
+	})
 )
 
 type Player struct {
@@ -37,6 +41,15 @@ func NewPlayer(o *il2cpp.Object) *Player {
 func PlayerFrom(o unsafe.Pointer) *Player {
 	object := il2cpp.NewObject(o)
 	return NewPlayer(object)
+}
+
+func LocalPlayer() *Player {
+	ret, err := localPlayerProp.GetGet().Invoke()
+	if err != nil {
+		return nil
+	}
+
+	return NewPlayer(ret)
 }
 
 func (p *Player) ApiPlayer() *sdkbase.VRCPlayerApi {
