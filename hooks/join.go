@@ -17,6 +17,8 @@ import "C"
 import (
 	"GoMod/menu"
 	"GoMod/reflect/AsmCs"
+	tmpro "GoMod/reflect/TMPro"
+	"GoMod/reflect/unity"
 	"GoMod/utils"
 	"unsafe"
 
@@ -79,6 +81,15 @@ func onJoin(managerPtrC, playerPtrC unsafe.Pointer) {
 	utils.Log("Player joined: %s", playerCache[playerPtr])
 
 	refreshNameCache()
+
+	tmpros := unity.GameObjectGetComponentsInChildren[tmpro.TMProUGui](player.GameObject(), true)
+	for i := 0; i < tmpros.Length(); i++ {
+		tmpro := tmpros.Get(i)
+		if tmpro.Name() == "Quest Text" {
+			tmpro.SetText("Broke")
+			break
+		}
+	}
 
 	C.InvokePlayerJoin(onJoinOriginal, managerPtrC, playerPtrC)
 }

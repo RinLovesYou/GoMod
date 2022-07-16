@@ -16,6 +16,13 @@ var (
 		return m.GetName() == "GetComponents" && len(m.GetParams()) == 1 && m.GetReturnType().GetName() == "UnityEngine.Component[]"
 	})
 
+	getComponentsInChildrenMethod, _ = GameObjectClass.GetMethodWhere(func(m il2cpp.Method) bool {
+		return m.GetName() == "GetComponentsInChildren" &&
+			len(m.GetParams()) == 2 &&
+			m.GetReturnType().GetName() == "UnityEngine.Component[]" &&
+			m.GetParams()[1].GetName() == "System.Boolean"
+	})
+
 	transformProperty, _ = GameObjectClass.GetProperty("transform")
 
 	findMethod, _ = GameObjectClass.GetMethod("Find")
@@ -29,6 +36,22 @@ func NewGameObject(obj *il2cpp.Object) *GameObject {
 	object := &GameObject{}
 	object.Il2CppObject = obj
 	return object
+}
+
+func GameObjectGetComponentsInChildren[T reflect.Generic](obj *GameObject, includeInactive bool) *mscorlib.Array[T] {
+	dummy := *new(T)
+	res, err := getComponentsInChildrenMethod.InvokeObject(
+		obj.Il2CppObject,
+		uintptr(dummy.GetType().Handle),
+		uintptr(unsafe.Pointer(&includeInactive)),
+	)
+	if err != nil {
+		return nil
+	}
+
+	arr := &mscorlib.Array[T]{}
+	arr.Object = *res
+	return arr
 }
 
 func GameObjectGetComponents[T reflect.Generic](obj *GameObject) *mscorlib.Array[T] {

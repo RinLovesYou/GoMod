@@ -19,11 +19,6 @@ var device unsafe.Pointer
 var context unsafe.Pointer
 var window unsafe.Pointer
 
-var showDemo bool
-var showMain = true
-var showPlayerList = true
-var showMouse bool
-
 func OnPresent(pSwapChain unsafe.Pointer, SyncInterval, FlagsT uint32) error {
 	if !gInitialized {
 		var err error
@@ -87,7 +82,9 @@ func WndProc(hwnd unsafe.Pointer, msg uint32, wparam, lparam unsafe.Pointer) err
 					}
 				case 'P', 'p':
 					if imgui.CurrentIO().KeyCtrlPressed() {
-						menu.PlayerListMenu.Shown = !menu.PlayerListMenu.Shown
+						if !menu.PlayerListMenu.Toggled {
+							menu.PlayerListMenu.Toggled = true
+						}
 					}
 				}
 			}

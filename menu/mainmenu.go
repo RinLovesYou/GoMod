@@ -37,9 +37,7 @@ func (s StringBool) String() string {
 var tabSys = NewTabSystem()
 
 func (m *MainMenu) Init() {
-	tabSys.tabs = append(tabSys.tabs, NewGoButton("Home", func() {
-		m.homePageRender()
-	}))
+	tabSys.tabs = append(tabSys.tabs, NewGoButton("Home", m.homePageRender))
 
 	tabSys.tabs = append(tabSys.tabs, NewGoButton("About", func() {
 		imgui.Text("GoMod v0.1.0 by RinLovesYou :)")

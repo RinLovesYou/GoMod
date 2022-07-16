@@ -9,28 +9,41 @@ import (
 type PlayerList struct {
 	Players []string
 	Shown   bool
+	Toggled bool
+	speed   float32
 }
 
-func NewPlayerList() PlayerList {
-	return PlayerList{
+func NewPlayerList() *PlayerList {
+	return &PlayerList{
 		Players: []string{},
 		Shown:   true,
+		Toggled: false,
+		speed:   1,
 	}
 }
 
-func (p PlayerList) Render() {
+var nextPosY = float32(15)
+
+func (p *PlayerList) Render() {
 	var colorToUse imgui.Vec4
 	if rainbowMenu {
 		colorToUse = imgui.Vec4{X: float32(rainbow.Clamped().R), Y: float32(rainbow.Clamped().G), Z: float32(rainbow.Clamped().B), W: 1}
 	} else {
 		colorToUse = mainColor
 	}
+	nextPosition := imgui.Vec2{X: 10, Y: nextPosY}
+
+	if p.Toggled {
+
+		p.Shown = p.Toggled
+		p.Toggled = false
+	}
 
 	if p.Shown {
-		imgui.SetNextWindowPosV(imgui.Vec2{X: 10, Y: 15}, imgui.ConditionAlways, imgui.Vec2{})
-		imgui.SetNextWindowSizeConstraints(imgui.Vec2{X: 200, Y: 0}, imgui.Vec2{X: 400, Y: 800})
+		imgui.SetNextWindowPosV(nextPosition, imgui.ConditionAlways, imgui.Vec2{})
+		imgui.SetNextWindowSizeConstraints(imgui.Vec2{X: 100, Y: 0}, imgui.Vec2{X: 400, Y: 800})
 		imgui.SetNextWindowBgAlpha(0.5)
-		imgui.BeginV("Player List", &p.Shown, imgui.WindowFlagsNoTitleBar|imgui.WindowFlagsNoDecoration|imgui.WindowFlagsNoMove|imgui.WindowFlagsAlwaysAutoResize)
+		imgui.BeginV("Player List", &p.Shown, imgui.WindowFlagsNoTitleBar|imgui.WindowFlagsNoMove|imgui.WindowFlagsNoScrollbar)
 
 		imgui.PushFont(DroidSansBeeg)
 
@@ -44,13 +57,19 @@ func (p PlayerList) Render() {
 
 		imgui.Separator()
 
-		imgui.PushFont(DroidSansMedium)
-		for _, name := range p.Players {
-			imgui.Text(fmt.Sprintf("- %s", name))
-		}
-		imgui.PopFont()
-
 		if len(p.Players) != 0 {
+
+			imgui.SetNextWindowBgAlpha(0)
+			imgui.BeginChild("PlayerListScroll")
+
+			imgui.PushFont(DroidSansMedium)
+			for _, name := range p.Players {
+				imgui.Text(fmt.Sprintf("- %s", name))
+			}
+			imgui.PopFont()
+
+			imgui.EndChild()
+
 			imgui.Separator()
 		}
 

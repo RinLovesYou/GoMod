@@ -11,6 +11,7 @@ var (
 	UnityEngineInputLegacyModule, _ = il2cpp.GetDomain().GetImage("UnityEngine.InputLegacyModule")
 	UnityEnginePhysicsModule, _     = il2cpp.GetDomain().GetImage("UnityEngine.PhysicsModule")
 	Mscorlib, _                     = il2cpp.GetDomain().GetImage("mscorlib")
+	TextMeshPro, _                  = il2cpp.GetDomain().GetImage("Unity.TextMeshPro")
 )
 
 type Generic interface {
