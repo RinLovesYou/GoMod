@@ -35,7 +35,7 @@ func initJoinHooks() error {
 	methods := AsmCs.OnVRCPlayerMethods()
 
 	//onJoin
-	method := methods[1]
+	method := methods[4]
 	methodPtr := method.Pointer()
 
 	err := gominhook.CreateHook(methodPtr, uintptr(C.onJoin), uintptr(unsafe.Pointer(&onJoinOriginal)))
@@ -48,7 +48,7 @@ func initJoinHooks() error {
 	}
 
 	//onLeave
-	method = methods[0]
+	method = methods[1]
 	methodPtr = method.Pointer()
 	if err != nil {
 		return err
